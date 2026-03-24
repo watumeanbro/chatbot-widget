@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@plugin '../hero.ts';
+
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --font-manrope: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial;
+  --font-space-grotesk: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial;
+  --font-bricolage: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial;
+  --font-instrument-serif: ui-serif, Georgia, "Times New Roman", Times, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.cc-email:-webkit-autofill,
+.cc-email:-webkit-autofill:hover,
+.cc-email:-webkit-autofill:focus,
+.cc-email:-webkit-autofill:active {
+  -webkit-text-fill-color: #8a95b0;
+  caret-color: #8a95b0;
+  box-shadow: 0 0 0 1000px #111827 inset;
+  transition: background-color 999999s ease-in-out 0s;
+}
+
+.all-\[unset\] {
+  all: unset;
+}
