@@ -14,8 +14,11 @@ export default function Page() {
     script.id = "chat-widget-preview-script";
     script.src = "/widget.js";
     script.async = true;
-    script.dataset.title = "Talk to Acme Studio";
-    script.dataset.subtitle = "Ask about services, pricing, or timelines.";
+    script.dataset.title = "Accadueo Club";
+    script.dataset.subtitle = "Chiedi info su abbonamenti, piscina e corsi.";
+    script.dataset.inline = "true";
+    script.dataset.startOpen = "true";
+    script.dataset.mountId = "chat-widget-inline-slot";
     document.body.appendChild(script);
 
     return () => {
@@ -34,6 +37,10 @@ export default function Page() {
         <h1 className="text-center font-[family-name:var(--font-space-grotesk)] text-5xl font-semibold tracking-[-0.05em] md:text-7xl">
           Accadueo Club - Chatbot Demo
         </h1>
+        <div
+          id="chat-widget-inline-slot"
+          className="mt-10 flex w-full justify-center"
+        />
       </div>
     </main>
   );

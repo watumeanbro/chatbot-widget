@@ -19,15 +19,21 @@
   const subtitle =
     script?.dataset.subtitle || "We usually reply in a few seconds.";
   const accent = script?.dataset.accent || "#ffffff";
+  const inline = script?.dataset.inline === "true";
+  const startOpen = script?.dataset.startOpen === "true" || inline;
+  const mountId = script?.dataset.mountId;
 
   const init = () => {
     if (!document.body) {
       return;
     }
 
+    const mountTarget = mountId
+      ? document.getElementById(mountId) || document.body
+      : document.body;
     const host = document.createElement("div");
     host.id = "claude-chat-widget-root";
-    document.body.appendChild(host);
+    mountTarget.appendChild(host);
 
     const shadowRoot = host.attachShadow({ mode: "open" });
 
@@ -42,10 +48,12 @@
       }
 
       .widget-shell {
-        position: fixed;
-        right: 24px;
-        bottom: 24px;
-        z-index: 2147483647;
+        position: ${inline ? "relative" : "fixed"};
+        right: ${inline ? "auto" : "24px"};
+        bottom: ${inline ? "auto" : "24px"};
+        width: ${inline ? "min(420px, 100%)" : "auto"};
+        margin: ${inline ? "0 auto" : "0"};
+        z-index: ${inline ? "1" : "2147483647"};
         font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         color: #ffffff;
       }
@@ -80,11 +88,11 @@
       }
 
       .chat-panel {
-        width: min(380px, calc(100vw - 24px));
+        width: ${inline ? "min(420px, 100%)" : "min(380px, calc(100vw - 24px))"};
         height: min(620px, calc(100vh - 110px));
-        display: none;
+        display: ${startOpen ? "flex" : "none"};
         flex-direction: column;
-        margin-top: 14px;
+        margin-top: ${inline ? "0" : "14px"};
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 24px;
         overflow: hidden;
@@ -99,6 +107,10 @@
 
       .chat-panel[data-open="true"] {
         display: flex;
+      }
+
+      .widget-shell[data-inline="true"] .chat-button {
+        display: none;
       }
 
       .header {
@@ -242,24 +254,24 @@
 
       @media (max-width: 640px) {
         .widget-shell {
-          right: 12px;
-          bottom: 12px;
+          right: ${inline ? "auto" : "12px"};
+          bottom: ${inline ? "auto" : "12px"};
         }
 
         .chat-panel {
-          width: calc(100vw - 24px);
+          width: ${inline ? "100%" : "calc(100vw - 24px)"};
           height: min(72vh, 560px);
           border-radius: 22px;
         }
       }
     </style>
-    <div class="widget-shell">
+    <div class="widget-shell" data-inline="${inline}">
       <button class="chat-button" type="button" aria-label="Open chat">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M7 10.5H17M7 14H13.5M20 11.6C20 16.07 16.42 19.7 12 19.7C10.63 19.7 9.35 19.35 8.23 18.74L4 20L5.25 15.97C4.47 14.75 4 13.28 4 11.6C4 7.13 7.58 3.5 12 3.5C16.42 3.5 20 7.13 20 11.6Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <section class="chat-panel" aria-label="Chat window" data-open="false">
+      <section class="chat-panel" aria-label="Chat window" data-open="${startOpen}">
         <div class="header">
           <div class="header-copy">
             <h2></h2>
@@ -321,12 +333,18 @@
     );
 
     openButton.addEventListener("click", () => setOpen(true));
-    closeButton.addEventListener("click", () => setOpen(false));
+    closeButton.addEventListener("click", () => {
+      if (!inline) {
+        setOpen(false);
+      }
+    });
 
     composer.addEventListener("input", autoResize);
     composer.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
-        setOpen(false);
+        if (!inline) {
+          setOpen(false);
+        }
         return;
       }
 
