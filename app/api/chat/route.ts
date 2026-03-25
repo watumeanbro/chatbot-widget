@@ -1,6 +1,6 @@
-import Groq from "groq-sdk";
-
 export const runtime = "nodejs";
+
+const GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 const BUSINESS_CONTEXT = `
 Réponds en français, en arabe et en anglais depending on the language used by the user.
@@ -135,41 +135,61 @@ export async function POST(request: Request) {
   }
 
   try {
-    const groq = new Groq({ apiKey });
-    const completion = await groq.chat.completions.create({
-      model: DEFAULT_MODEL,
-      temperature: 0.2,
-      max_tokens: 500,
-      messages: [
-        {
-          role: "system" as const,
-          content: [
-            "You are the website chat assistant for this business.",
-            "Use the business context below to answer visitor questions accurately.",
-            "If the answer is not supported by the context, say so clearly.",
-            "",
-            BUSINESS_CONTEXT,
-          ].join("\n"),
-        },
-        {
-          role: "user" as const,
-          content: message,
-        },
-      ],
+    const groqResponse = await fetch(GROQ_CHAT_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: DEFAULT_MODEL,
+        temperature: 0.2,
+        max_tokens: 500,
+        messages: [
+          {
+            role: "system",
+            content: [
+              "You are the website chat assistant for this business.",
+              "Use the business context below to answer visitor questions accurately.",
+              "If the answer is not supported by the context, say so clearly.",
+              "",
+              BUSINESS_CONTEXT,
+            ].join("\n"),
+          },
+          {
+            role: "user",
+            content: message,
+          },
+        ],
+      }),
     });
 
-    const answer = completion.choices
-      .flatMap((choice) => {
-        const content = choice.message?.content;
+    if (!groqResponse.ok) {
+      return Response.json(
+        {
+          error:
+            "Groq could not answer that request right now. Check the API key and try again.",
+        },
+        {
+          status: groqResponse.status,
+          headers: corsHeaders,
+        },
+      );
+    }
 
-        if (typeof content !== "string") {
-          return [];
-        }
+    const data = (await groqResponse.json()) as {
+      choices?: Array<{
+        message?: {
+          content?: string | null;
+        };
+      }>;
+    };
 
-        const trimmed = content.trim();
-        return trimmed ? [trimmed] : [];
-      })
-      .join("\n\n");
+    const answer =
+      data.choices
+        ?.map((choice) => choice.message?.content?.trim())
+        .filter((content): content is string => Boolean(content))
+        .join("\n\n") || "";
 
     return Response.json(
       {
