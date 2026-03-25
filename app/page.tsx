@@ -14,10 +14,10 @@ export default function Page() {
     script.id = "chat-widget-preview-script";
     script.src = "/widget.js";
     script.async = true;
-    script.dataset.title = "Accadueo Club";
-    script.dataset.subtitle = "Chiedi info su abbonamenti, piscina e corsi.";
+    script.dataset.title = "Assistente Accadueo Club";
+    script.dataset.subtitle =
+      "Chiedimi info su corsi, abbonamenti e orari";
     script.dataset.inline = "true";
-    script.dataset.startOpen = "true";
     script.dataset.mountId = "chat-widget-inline-slot";
     document.body.appendChild(script);
 

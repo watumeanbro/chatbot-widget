@@ -20,7 +20,7 @@
     script?.dataset.subtitle || "We usually reply in a few seconds.";
   const accent = script?.dataset.accent || "#ffffff";
   const inline = script?.dataset.inline === "true";
-  const startOpen = script?.dataset.startOpen === "true" || inline;
+  const startOpen = script?.dataset.startOpen === "true";
   const mountId = script?.dataset.mountId;
 
   const init = () => {
@@ -107,10 +107,6 @@
 
       .chat-panel[data-open="true"] {
         display: flex;
-      }
-
-      .widget-shell[data-inline="true"] .chat-button {
-        display: none;
       }
 
       .header {
@@ -333,18 +329,12 @@
     );
 
     openButton.addEventListener("click", () => setOpen(true));
-    closeButton.addEventListener("click", () => {
-      if (!inline) {
-        setOpen(false);
-      }
-    });
+    closeButton.addEventListener("click", () => setOpen(false));
 
     composer.addEventListener("input", autoResize);
     composer.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
-        if (!inline) {
-          setOpen(false);
-        }
+        setOpen(false);
         return;
       }
 
