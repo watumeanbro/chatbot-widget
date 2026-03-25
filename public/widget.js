@@ -324,7 +324,7 @@
     };
 
     appendMessage(
-      "Hi there. Ask a question about the business and I'll answer from the company info provided.",
+      "Ciao! Sono l'assistente virtuale di Accadueo Club. Come posso aiutarti?",
       "assistant"
     );
 
