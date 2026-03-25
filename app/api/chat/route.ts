@@ -1,5 +1,7 @@
 import Groq from "groq-sdk";
 
+export const runtime = "nodejs";
+
 const BUSINESS_CONTEXT = `
 Réponds en français, en arabe et en anglais depending on the language used by the user.
 
@@ -140,7 +142,7 @@ export async function POST(request: Request) {
       max_tokens: 500,
       messages: [
         {
-          role: "system",
+          role: "system" as const,
           content: [
             "You are the website chat assistant for this business.",
             "Use the business context below to answer visitor questions accurately.",
@@ -150,15 +152,23 @@ export async function POST(request: Request) {
           ].join("\n"),
         },
         {
-          role: "user",
+          role: "user" as const,
           content: message,
         },
       ],
     });
 
     const answer = completion.choices
-      .map((choice) => choice.message?.content?.trim())
-      .filter(Boolean)
+      .flatMap((choice) => {
+        const content = choice.message?.content;
+
+        if (typeof content !== "string") {
+          return [];
+        }
+
+        const trimmed = content.trim();
+        return trimmed ? [trimmed] : [];
+      })
       .join("\n\n");
 
     return Response.json(
