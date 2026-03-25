@@ -324,7 +324,7 @@
     };
 
     appendMessage(
-      "Ciao! Sono l'assistente virtuale di Accadueo Club. Come posso aiutarti?",
+      "Bonjour ! Je suis l'assistant virtuel de Play Fitness. Comment puis-je vous aider ?",
       "assistant"
     );
 
