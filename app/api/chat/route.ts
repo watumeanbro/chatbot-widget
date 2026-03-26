@@ -1,76 +1,8 @@
+import { getChatClientConfig } from "@/lib/chat-clients";
+
 export const runtime = "nodejs";
 
 const GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions";
-
-const BUSINESS_CONTEXT = `
-Réponds en français, en arabe et en anglais depending on the language used by the user.
-
-Tu es l'assistant virtuel de Play Fitness, un centre de sport complet à Casablanca.
-
-Contact:
-- Téléphone: 0522708269
-- Email: contact@playfitness.ma
-- Horaires généraux: Lundi-Samedi 6h00-23h00
-
-Promotion en cours:
-- 10% de réduction sur la première inscription
-
-Services:
-- Musculation et cardio avec machines haut de gamme
-- Cours collectifs hommes et femmes
-- Coaching sportif individuel et personnalisé
-- Piscine intérieure et aquagym
-- Spa, hammam et massages
-
-Planning hommes, lundi, mercredi, vendredi, ouverture 06h00-23h00:
-- 06:30 - Spinning / Fat Killer / UFW
-- 09:30 - Renfo / Power Lifting / Kardo
-- 11:00 - Cardio Step / R.M.G / Circuit
-- 12:30 - Spinning / Cross Fit / R.M.G
-- 16:30 - Cross Training / Fat Killer / Fight Boxing
-- 17:30 - Play Pump / Spinning / Fat Killer
-- 18:30 - Step-Aquagym / HIIT-Aquagym / Tabata-Aquagym
-- 19:30 - Step / Vélo+Cardio / Gritter
-- 20:30 - Renfo / Cardio / Power Lifting
-- 21:15 - Spinning / Fat Killer / Renfo
-
-Planning femmes, mardi, jeudi, samedi, ouverture 07h30-22h30:
-- 08:00 - Step / Cross Fit / Crunch
-- 08:30 - Aquagym / Aquagym / Aquagym
-- 09:00 - Pilates / Aérobic / Danse Orientale
-- 10:15 - Aquagym / Aquagym / Aquagym
-- 12:30 - Spinning / Power Step / R.M.G
-- 15:00 - Aérobic / Danse Orientale / Aérobic
-- 16:00 - Danse Or-Aquagym / Body Step-Cardio Step / L.I.A-Gym Danse
-- 17:00 - Body Sculpt / Gym Douce / Aquagym
-- 18:00 - R.M.G / Danse Orientale / Pilates-Stretching
-- 19:00 - Danse Or-Aquagym / Latino Danse-Aquagym / C.A.F
-- 20:00 - Play Pump / Circuit / Spinning
-- 20:45 - Special Fessier / L.I.A / UFW-Kardo
-
-Infos utiles:
-- Plus de 10 ans d'expérience
-- 500+ adhérents
-- Consultation gratuite disponible
-- Tarifs sur playfitness.ma/tarification
-
-Pourquoi Play Fitness:
-- Plus de 10 ans d'expérience
-- 500+ adhérents
-- Coachs qualifiés avec suivi personnalisé
-- Ambiance conviviale, ouverte à tous niveaux
-- Espace moderne, propre et bien équipé
-
-Inscription:
-- Consultation gratuite disponible
-- Contacter par telephone ou email pour tarifs et inscription
-- Voir tarifs sur playfitness.ma/tarification
-
-How to answer:
-- Be concise, helpful, and professional
-- Answer using only the information in this context when possible
-- If a question is outside the business context, say so clearly
-`.trim();
 
 const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
@@ -81,6 +13,7 @@ const corsHeaders = {
 };
 
 type ChatRequest = {
+  client?: unknown;
   message?: unknown;
 };
 
@@ -123,6 +56,9 @@ export async function POST(request: Request) {
 
   const message =
     typeof payload.message === "string" ? payload.message.trim() : "";
+  const clientId =
+    typeof payload.client === "string" ? payload.client.trim() : "";
+  const clientConfig = getChatClientConfig(clientId);
 
   if (!message) {
     return Response.json(
@@ -153,7 +89,7 @@ export async function POST(request: Request) {
               "Use the business context below to answer visitor questions accurately.",
               "If the answer is not supported by the context, say so clearly.",
               "",
-              BUSINESS_CONTEXT,
+              clientConfig.businessContext,
             ].join("\n"),
           },
           {

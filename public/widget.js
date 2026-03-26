@@ -15,9 +15,13 @@
     script?.dataset.apiBase ||
     new URL(script?.src || window.location.href).origin;
   const endpoint = `${apiBase.replace(/\/$/, "")}/api/chat`;
+  const client = script?.dataset.client || "playfitness";
   const title = script?.dataset.title || "Ask us anything";
   const subtitle =
     script?.dataset.subtitle || "We usually reply in a few seconds.";
+  const greeting =
+    script?.dataset.greeting ||
+    "Hi there. Ask a question about the business and I'll answer from the company info provided.";
   const accent = script?.dataset.accent || "#ffffff";
   const inline = script?.dataset.inline === "true";
   const startOpen = script?.dataset.startOpen === "true";
@@ -324,7 +328,7 @@
     };
 
     appendMessage(
-      "Bonjour ! Je suis l'assistant virtuel de Play Fitness. Comment puis-je vous aider ?",
+      greeting,
       "assistant"
     );
 
@@ -367,7 +371,7 @@
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message }),
+          body: JSON.stringify({ client, message }),
         });
 
         const data = await response.json();
