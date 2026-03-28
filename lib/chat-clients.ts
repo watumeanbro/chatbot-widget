@@ -1,6 +1,7 @@
 export type ChatClientId =
   | "Accadueo"
   | "crocetta"
+  | "dentalp"
   | "playfitness"
   | "primegym";
 
@@ -262,6 +263,46 @@ Patient Journey:
 - Treatment planning
 - Follow-up schedule
 - Pain management
+`.trim(),
+  },
+  dentalp: {
+    id: "dentalp",
+    businessName: "Studio DentalP",
+    headline: "Studio DentalP — Chatbot Demo",
+    widgetTitle: "Assistente DentalP",
+    widgetSubtitle: "Chiedimi info su servizi, orari e prenotazioni",
+    greeting:
+      "Ciao! Sono l'assistente virtuale di Studio DentalP. Come posso aiutarti?",
+    businessContext: `
+Rispondi sempre in italiano. Sei l'assistente virtuale di Studio Medico Dentistico DentalP, studio dentistico con sedi a Milano e Melzo, attivo dal 1980.
+
+SEDE MILANO:
+- Via Privata Turro 7, 20127 Milano
+- Tel: 02 2820542
+
+SEDE MELZO:
+- Piazza Risorgimento 12, 20066 Melzo
+- Tel: 02 95737791
+
+EMAIL:
+- info@studiodentalp.it
+
+ORARI:
+- Lunedì-Venerdì 9:00-19:00
+
+SERVIZI:
+- Ortodonzia
+- parodontologia
+- odontoiatria conservativa
+- igiene dentale
+- prevenzione
+- restauri dentali
+- prenotazione online disponibile
+
+INFO:
+- Studio fondato nel 1980
+- punto di riferimento nella zona Viale Monza a Milano
+- Filosofia basata su etica, conoscenza e innovazione
 `.trim(),
   },
   playfitness: {
