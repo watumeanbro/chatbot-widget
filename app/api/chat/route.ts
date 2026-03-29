@@ -14,7 +14,13 @@ const corsHeaders = {
 
 type ChatRequest = {
   client?: unknown;
+  history?: unknown;
   message?: unknown;
+};
+
+type ChatHistoryItem = {
+  content: string;
+  role: "assistant" | "user";
 };
 
 export async function OPTIONS() {
@@ -59,6 +65,32 @@ export async function POST(request: Request) {
   const clientId =
     typeof payload.client === "string" ? payload.client.trim() : "";
   const clientConfig = getChatClientConfig(clientId);
+  const history = Array.isArray(payload.history)
+    ? payload.history
+        .map((item): ChatHistoryItem | null => {
+          if (!item || typeof item !== "object") {
+            return null;
+          }
+
+          const role =
+            "role" in item && typeof item.role === "string" ? item.role : "";
+          const content =
+            "content" in item && typeof item.content === "string"
+              ? item.content.trim()
+              : "";
+
+          if (!content || (role !== "user" && role !== "assistant")) {
+            return null;
+          }
+
+          return {
+            role,
+            content,
+          };
+        })
+        .filter((item): item is ChatHistoryItem => Boolean(item))
+        .slice(-12)
+    : [];
 
   if (!message) {
     return Response.json(
@@ -88,10 +120,15 @@ export async function POST(request: Request) {
               "You are the website chat assistant for this business.",
               "Use the business context below to answer visitor questions accurately.",
               "If the answer is not supported by the context, say so clearly.",
+              "Think carefully about what the user is asking before answering.",
+              "Use the conversation history to understand follow-up questions.",
+              "If the user asks a follow-up like 'which one is cheapest' or 'and for long-form?', infer the topic from the previous messages and answer directly.",
+              "Answer the user's exact question first in one clear sentence before adding extra detail.",
               "",
               clientConfig.businessContext,
             ].join("\n"),
           },
+          ...history,
           {
             role: "user",
             content: message,

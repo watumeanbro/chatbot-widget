@@ -26,6 +26,7 @@
   const inline = script?.dataset.inline === "true";
   const startOpen = script?.dataset.startOpen === "true";
   const mountId = script?.dataset.mountId;
+  const conversationHistory = [];
 
   const init = () => {
     if (!document.body) {
@@ -312,6 +313,14 @@
       return node;
     };
 
+    const rememberMessage = (content, role) => {
+      conversationHistory.push({ role, content });
+
+      if (conversationHistory.length > 12) {
+        conversationHistory.splice(0, conversationHistory.length - 12);
+      }
+    };
+
     const setOpen = (isOpen) => {
       panel.dataset.open = String(isOpen);
 
@@ -331,6 +340,7 @@
       greeting,
       "assistant"
     );
+    rememberMessage(greeting, "assistant");
 
     openButton.addEventListener("click", () => setOpen(true));
     closeButton.addEventListener("click", () => setOpen(false));
@@ -358,6 +368,7 @@
       }
 
       appendMessage(message, "user");
+      rememberMessage(message, "user");
       composer.value = "";
       autoResize();
       composer.disabled = true;
@@ -371,7 +382,11 @@
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ client, message }),
+          body: JSON.stringify({
+            client,
+            history: conversationHistory,
+            message,
+          }),
         });
 
         const data = await response.json();
@@ -383,17 +398,17 @@
             "assistant"
           );
         } else {
-          appendMessage(
-            data.answer || "I could not generate a reply. Please try again.",
-            "assistant"
-          );
+          const answer =
+            data.answer || "I could not generate a reply. Please try again.";
+          appendMessage(answer, "assistant");
+          rememberMessage(answer, "assistant");
         }
       } catch {
         statusNode.remove();
-        appendMessage(
-          "The chat service is unavailable right now. Please try again in a moment.",
-          "assistant"
-        );
+        const fallbackMessage =
+          "The chat service is unavailable right now. Please try again in a moment.";
+        appendMessage(fallbackMessage, "assistant");
+        rememberMessage(fallbackMessage, "assistant");
       } finally {
         composer.disabled = false;
         sendButton.disabled = false;
