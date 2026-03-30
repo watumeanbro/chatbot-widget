@@ -4,8 +4,14 @@ export type ChatClientId =
   | "dentalp"
   | "montti"
   | "montti2"
+  | "montti3"
   | "playfitness"
   | "primegym";
+
+export type ChatPromptSuggestion = {
+  answer: string;
+  question: string;
+};
 
 export type ChatClientConfig = {
   id: ChatClientId;
@@ -16,12 +22,18 @@ export type ChatClientConfig = {
   widgetSubtitle: string;
   greeting: string;
   businessContext: string;
+  promptSuggestions?: ChatPromptSuggestion[];
+  teaserText?: string;
+  themeVariant?: "default" | "montti";
 };
 
 type PublicChatClientConfig = {
   enabled: boolean;
   greeting: string;
   id: ChatClientId;
+  promptSuggestions?: ChatPromptSuggestion[];
+  teaserText?: string;
+  themeVariant?: "default" | "montti";
   widgetSubtitle: string;
   widgetTitle: string;
 };
@@ -644,6 +656,31 @@ INFO:
       "Hi! I’m the virtual assistant for Montti.ma. How can I help you with your video editing today?",
     businessContext: MONTTI_SHARED_CONTEXT,
   },
+  montti3: {
+    id: "montti3",
+    businessName: "Montti",
+    enabled: true,
+    headline: "Montti — Chatbot Demo",
+    widgetTitle: "Montti Assistant",
+    widgetSubtitle: "Ask me about plans, delivery, and how to get started..",
+    greeting:
+      "Hi! I’m the virtual assistant for Montti.ma. How can I help you with your video editing today?",
+    businessContext: MONTTI_SHARED_CONTEXT,
+    teaserText: "3andek chi so2al?",
+    themeVariant: "montti",
+    promptSuggestions: [
+      {
+        question: "ch7al diyal lwa9t bach iwasalni lfinal editedvideo?",
+        answer:
+          "tasslin kaykon f 48h mn ba3d t2kid talab dyalk (48 sa3a katbda mn ba3d ma ntwaslou m3ak f WhatsApp, had chert maytba9sh 3la videos YouTube). ila fetna deadline, kaywslek refund diyal 50% 3la l order dyalk.",
+      },
+      {
+        question: "wash t9adro diro maghyirat mn ba3d ma ntwassel bi lvideo?",
+        answer:
+          "akid! 3la 7asb lplan dyalk, kaykon 3andk 3adad mo7adad diyal revisions fabor. revisions zyada ba3d hadshi ghatkoun bflouss zayda.",
+      },
+    ],
+  },
   playfitness: {
     id: "playfitness",
     businessName: "Play Fitness",
@@ -796,6 +833,9 @@ export function getPublicChatClientConfig(
     enabled: config.enabled,
     greeting: config.greeting,
     id: config.id,
+    promptSuggestions: config.promptSuggestions,
+    teaserText: config.teaserText,
+    themeVariant: config.themeVariant,
     widgetSubtitle: config.widgetSubtitle,
     widgetTitle: config.widgetTitle,
   };
