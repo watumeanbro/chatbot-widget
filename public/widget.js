@@ -14,24 +14,53 @@
   const apiBase =
     script?.dataset.apiBase ||
     new URL(script?.src || window.location.href).origin;
+  const configEndpoint = `${apiBase.replace(/\/$/, "")}/api/chat/config`;
   const endpoint = `${apiBase.replace(/\/$/, "")}/api/chat`;
-  const client = script?.dataset.client || "playfitness";
-  const title = script?.dataset.title || "Ask us anything";
-  const subtitle =
-    script?.dataset.subtitle || "We usually reply in a few seconds.";
-  const greeting =
-    script?.dataset.greeting ||
-    "Hi there. Ask a question about the business and I'll answer from the company info provided.";
-  const accent = script?.dataset.accent || "#ffffff";
+  const client = script?.dataset.id || script?.dataset.client || "playfitness";
+  const titleOverride = script?.dataset.title;
+  const subtitleOverride = script?.dataset.subtitle;
+  const greetingOverride = script?.dataset.greeting;
+  const accent = script?.dataset.color || script?.dataset.accent || "#111111";
   const inline = script?.dataset.inline === "true";
   const startOpen = script?.dataset.startOpen === "true";
   const mountId = script?.dataset.mountId;
   const conversationHistory = [];
 
-  const init = () => {
+  const init = async () => {
     if (!document.body) {
       return;
     }
+
+    let config;
+
+    try {
+      const response = await fetch(
+        `${configEndpoint}?client=${encodeURIComponent(client)}`,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!response.ok) {
+        return;
+      }
+
+      config = await response.json();
+    } catch {
+      return;
+    }
+
+    if (!config?.enabled) {
+      return;
+    }
+
+    const title = titleOverride || config.widgetTitle || "Ask us anything";
+    const subtitle =
+      subtitleOverride || config.widgetSubtitle || "We usually reply in a few seconds.";
+    const greeting =
+      greetingOverride ||
+      config.greeting ||
+      "Hi there. Ask a question about the business and I'll answer from the company info provided.";
 
     const mountTarget = mountId
       ? document.getElementById(mountId) || document.body
@@ -66,13 +95,13 @@
       .chat-button {
         width: 64px;
         height: 64px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 999px;
         background:
-          radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 55%),
-          linear-gradient(180deg, #191919 0%, #0a0a0a 100%);
+          radial-gradient(circle at top, rgba(255, 255, 255, 0.24), transparent 58%),
+          linear-gradient(180deg, ${accent} 0%, #0a0a0a 100%);
         color: #ffffff;
-        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
         cursor: pointer;
         display: grid;
         place-items: center;
@@ -81,7 +110,7 @@
 
       .chat-button:hover {
         transform: translateY(-1px);
-        box-shadow: 0 22px 56px rgba(0, 0, 0, 0.46);
+        box-shadow: 0 22px 56px rgba(0, 0, 0, 0.44);
       }
 
       .chat-button:focus-visible,
@@ -99,13 +128,13 @@
         flex-direction: column;
         margin-top: ${inline ? "0" : "14px"};
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
+        border-radius: 20px;
         overflow: hidden;
         background:
-          radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 38%),
-          linear-gradient(180deg, rgba(19, 19, 19, 0.98), rgba(7, 7, 7, 0.98));
+          radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 36%),
+          linear-gradient(180deg, rgba(23, 23, 23, 0.98), rgba(10, 10, 10, 0.99));
         backdrop-filter: blur(18px);
-        box-shadow: 0 22px 70px rgba(0, 0, 0, 0.48);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.42);
         transform-origin: bottom right;
         animation: panel-in 180ms ease;
       }
@@ -121,6 +150,7 @@
         gap: 16px;
         padding: 18px 18px 14px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
       }
 
       .header-copy h2 {
@@ -230,8 +260,8 @@
         height: 48px;
         border: 0;
         border-radius: 16px;
-        background: #ffffff;
-        color: #090909;
+        background: ${accent};
+        color: #ffffff;
         font-weight: 600;
         cursor: pointer;
         padding: 0 14px;
@@ -418,9 +448,11 @@
   };
 
   if (document.body) {
-    init();
+    void init();
     return;
   }
 
-  window.addEventListener("DOMContentLoaded", init, { once: true });
+  window.addEventListener("DOMContentLoaded", () => {
+    void init();
+  }, { once: true });
 })();

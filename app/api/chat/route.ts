@@ -1,4 +1,4 @@
-import { getChatClientConfig } from "@/lib/chat-clients";
+import { findChatClientConfig, getChatClientConfig } from "@/lib/chat-clients";
 
 export const runtime = "nodejs";
 
@@ -64,7 +64,28 @@ export async function POST(request: Request) {
     typeof payload.message === "string" ? payload.message.trim() : "";
   const clientId =
     typeof payload.client === "string" ? payload.client.trim() : "";
-  const clientConfig = getChatClientConfig(clientId);
+  const clientConfig =
+    clientId ? findChatClientConfig(clientId) : getChatClientConfig(clientId);
+
+  if (!clientConfig) {
+    return Response.json(
+      { error: "Unknown chatbot id." },
+      {
+        status: 404,
+        headers: corsHeaders,
+      },
+    );
+  }
+
+  if (!clientConfig.enabled) {
+    return Response.json(
+      { error: "This chatbot is currently unavailable." },
+      {
+        status: 403,
+        headers: corsHeaders,
+      },
+    );
+  }
   const history = Array.isArray(payload.history)
     ? payload.history
         .map((item): ChatHistoryItem | null => {

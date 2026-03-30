@@ -24,7 +24,7 @@ export function ChatbotDemoPage({
     script.id = "chat-widget-preview-script";
     script.src = "/widget.js";
     script.async = true;
-    script.dataset.client = client.id;
+    script.dataset.id = client.id;
     script.dataset.title = client.widgetTitle;
     script.dataset.subtitle = client.widgetSubtitle;
     script.dataset.greeting = client.greeting;
