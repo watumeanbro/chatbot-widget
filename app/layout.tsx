@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -38,6 +39,13 @@ export default function RootLayout({
         className="min-h-screen text-foreground bg-background font-sans antialiased"
       >
         <Providers>{children}</Providers>
+        <Script
+          src="https://chatbot-widget-ruddy-kappa.vercel.app/montti2/widget.js"
+          data-id="montti2"
+          data-title="Montti Assistant"
+          data-color="#111111"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
