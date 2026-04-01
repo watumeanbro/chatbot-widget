@@ -77,7 +77,7 @@
     const accent =
       script?.dataset.color ||
       script?.dataset.accent ||
-      (isNotionMonttiTheme ? "#DCB9FD" : isMonttiTheme ? "#DFBEFE" : "#111111");
+      (isNotionMonttiTheme ? "#4e3cb5" : isMonttiTheme ? "#DFBEFE" : "#111111");
     const title = titleOverride || config.widgetTitle || "Ask us anything";
     const subtitle =
       subtitleOverride ||
@@ -92,7 +92,11 @@
       typeof config.teaserDurationMs === "number" ? config.teaserDurationMs : 0;
     const promptSuggestions = defaultPromptSuggestions(config.promptSuggestions);
     const placeholder =
-      isMonttiTheme ? "ktb sou2alek..." : "Ask a question...";
+      isNotionMonttiTheme
+        ? "Ask anything about Montti..."
+        : isMonttiTheme
+          ? "ktb sou2alek..."
+          : "Ask a question...";
     const mountTarget = mountId
       ? document.getElementById(mountId) || document.body
       : document.body;
@@ -315,6 +319,12 @@
           line-height: 1.55;
           white-space: pre-wrap;
           word-break: break-word;
+        }
+
+        .message a {
+          color: inherit;
+          text-decoration: underline;
+          text-underline-offset: 2px;
         }
 
         .message.assistant {
@@ -673,10 +683,25 @@
     heading.textContent = title;
     subheading.textContent = subtitle;
 
+    const formatMessageHtml = (content) => {
+      const escaped = content
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+
+      const withLinks = escaped.replace(
+        /(https?:\/\/[^\s<]+)/g,
+        (match) =>
+          `<a href="${match}" target="_blank" rel="noopener noreferrer">${match}</a>`,
+      );
+
+      return withLinks.replace(/\n/g, "<br />");
+    };
+
     const appendMessage = (content, role) => {
       const node = document.createElement("div");
       node.className = `message ${role}`;
-      node.textContent = content;
+      node.innerHTML = formatMessageHtml(content);
       messages.appendChild(node);
       messages.scrollTop = messages.scrollHeight;
       return node;

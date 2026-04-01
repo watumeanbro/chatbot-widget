@@ -42,7 +42,7 @@ export default function MonttiZeroPage() {
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-6 py-12 text-black">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,185,253,0.35),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(220,185,253,0.18),transparent_24%)]" />
       <h1 className="relative text-center font-sans text-5xl font-semibold tracking-[-0.06em] md:text-7xl">
-        <span className="text-[#DCB9FD]">Montti</span>
+        <span className="text-[#4e3cb5]">Montti</span>
         <span> — Chatbot Demo</span>
       </h1>
     </main>
