@@ -683,6 +683,35 @@
     heading.textContent = title;
     subheading.textContent = subtitle;
 
+    const getLinkLabel = (rawUrl) => {
+      try {
+        const url = new URL(rawUrl);
+        const hostname = url.hostname.replace(/^www\./, "");
+        const path = url.pathname.replace(/\/+$/, "");
+
+        if (hostname === "instagram.com" && path) {
+          return path.split("/").filter(Boolean).join("/") || "Instagram";
+        }
+
+        if (hostname === "youtube.com" && path) {
+          return path.split("/").filter(Boolean).join("/") || "YouTube";
+        }
+
+        if (hostname === "montti.ma") {
+          if (!path || path === "") {
+            return "montti.ma";
+          }
+
+          const cleanPath = path.split("/").filter(Boolean).join("/");
+          return `montti.ma/${cleanPath}`;
+        }
+
+        return `${hostname}${path}`;
+      } catch {
+        return rawUrl;
+      }
+    };
+
     const formatMessageHtml = (content) => {
       const escaped = content
         .replaceAll("&", "&amp;")
@@ -692,7 +721,7 @@
       const withLinks = escaped.replace(
         /(https?:\/\/[^\s<]+)/g,
         (match) =>
-          `<a href="${match}" target="_blank" rel="noopener noreferrer">${match}</a>`,
+          `<a href="${match}" target="_blank" rel="noopener noreferrer">${getLinkLabel(match)}</a>`,
       );
 
       return withLinks.replace(/\n/g, "<br />");
